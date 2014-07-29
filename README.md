@@ -1,10 +1,10 @@
-# *********************************************** #
-# This is a function designed to take spectral
-# flux densities and a B-V color excess, E(B-V), 
-# and return extinction corrected fluxes using
-# the interstellar extinction law of Cardelli,
-# Clayton & Mathis (1989).
-# *********************************************** #
+*********************************************** 
+This is a function designed to take spectral
+flux densities and a B-V color excess, E(B-V), 
+and return extinction corrected fluxes using
+the interstellar extinction law of Cardelli,
+Clayton & Mathis (1989).
+*********************************************** 
 
 To use the function it can be imported via 
 

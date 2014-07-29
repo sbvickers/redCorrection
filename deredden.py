@@ -47,20 +47,14 @@ def law_uv(a, b, wave):
        returns two vectors of extinction law values
        for the uv regime 0.125um - 0.303um
     """
-    f_a = np.empty(len(wave[(wave >= 3.3) & (wave <= 8.0)]), dtype=float)
-    f_a[:] = np.NaN
-    
-    f_b = np.empty(len(wave[(wave >= 3.3) & (wave <= 8.0)]), dtype=float)
-    f_b[:] = np.NaN
+    f_a = np.zeros(len(wave[(wave >= 3.3) & (wave <= 8.0)]))
+    f_b = np.zeros(len(wave[(wave >= 3.3) & (wave <= 8.0)]))
 
     y = wave[(wave >=3.3) & (wave <= 8.0)]
 
     if len(y[y >= 5.9]) > 0:
         f_a[y >= 5.9] = -0.04473*(y[y >= 5.9] - 5.9)**2 - 0.009779*(y[y >= 5.9] - 5.9)**3
         f_b[y >= 5.9] = -0.2130*(y[y >= 5.9] - 5.9)**2 - 0.1207*(y[y >= 5.9] - 5.9)**3
-
-    f_a[y < 5.9] = 0
-    f_b[y < 5.9] = 0
 
     a[(wave >= 3.3) & (wave <= 8.0)] = 1.752 - 0.316 * y - 0.104/((y-4.67)**2 + 0.341) + f_a
     b[(wave>= 3.3) & (wave <= 8.0)] = -3.090 + 1.825 * y + 1.206/((y-4.62)**2 + 0.263) + f_b
@@ -80,27 +74,52 @@ def law_fuv(a, b, wave):
 
     return a, b
 
-def dered(wave, flux, A_v, R_v = 3.1):
+def dered(wave, flux, e_bv, R_v = 3.089):
     """
-        dereddens a spectra from 0.1 microns through
-        to the far IR
+        Corrects fluxes using the given reddening E(B-V), using the Cardelli,
+        Clayton & Mathis (1989) formulation with updated IR coefficients.
+
+        Parameters
+        ----------
+                wave : list, ndarray
+                The wavelengths of the fluxes in microns, forces to ndarray 
+                if type is list.  
+
+                flux : list, ndarray
+                The fluxes at each wavelength in spectral flux density units,
+                forces to ndarray if type is list.
+
+                e_bv : float, ufloat
+                The B-V color excess for the object. If color excess is a ufloat
+                then the resultant fluxes will have an associated uncertainty.
+
+                R_v : float, ufloat
+                The ratio of total to selective extinction in the UV bands B and
+                V. Defaults to R_v = 3.089 if no value is given.
+
+        Returns
+        ----------
+                flux : ndarray
+                Returns a numpy array of extinction corrected fluxes, using the
+                supplied E(B-V) and R_v values. If an uncertainty was defined
+                for either the input fluxes or the E(B-V) value then the
+                resultant ndarray will be an array of ufloat objects.
     """
+
+    if (type(wave) != np.ndarray):
+        wave = np.array(wave)
+
+    if (type(flux) != np.ndarray):
+        flux = np.array(flux)
+
     wave = 1 / wave
-   
-    a = np.empty(len(wave), dtype=float)
-    a[:] = np.NaN
 
-    b = np.empty(len(wave), dtype=float)
-    b[:] = np.NaN
+    a, b = np.zeros(len(wave)), np.zeros(len(wave))
 
-# law_ir is for lambda > 0.909 microns
+    laws = [law_uv, law_fuv, law_nir, law_ir]
 
-    a, b = law_uv(a, b, wave)
-    a, b = law_fuv(a, b, wave)
-    a, b = law_nir(a, b, wave)
-    a, b = law_ir(a, b, wave)
-    
-    A_lambda = A_v * (a + b/R_v)
+    for law in laws:
+        a, b = law(a, b, wave)
 
-    return flux * 10**(0.4*A_lambda)
+    return flux * 10**(0.4 * ( (e_bv * R_v) * (a + b/R_v) ) )
 

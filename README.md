@@ -3,7 +3,7 @@ This is a function designed to take spectral
 flux densities and a B-V color excess, E(B-V), 
 and return extinction corrected fluxes using
 the interstellar extinction law of Cardelli,
-Clayton & Mathis (1989).
+Clayton & Mathis (1989).*
 *********************************************** 
 
 To use the function it can be imported via 
@@ -20,7 +20,7 @@ and then simply call the primary function via
 
 where the arguments are lists/ndarray's of wavelengths 
 and fluxes and E(B-V) and R_v (optional) floats or 
-ufloats*.
+ufloats.**
 
 If no R_v value is given then it will default to 
 
@@ -28,5 +28,5 @@ If no R_v value is given then it will default to
 
 the average R_v for the diffuse interstellar medium.
 
-*ufloats are objects from the uncertainties python
-package.
+*http://adsabs.harvard.edu/abs/1989ApJ...345..245C
+**https://pypi.python.org/pypi/uncertainties/

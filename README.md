@@ -29,4 +29,5 @@ If no R_v value is given then it will default to
 the average R_v for the diffuse interstellar medium.
 
 *http://adsabs.harvard.edu/abs/1989ApJ...345..245C
+
 **https://pypi.python.org/pypi/uncertainties/
